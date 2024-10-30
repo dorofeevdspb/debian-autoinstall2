@@ -15,6 +15,29 @@ export PRESED_FILE="preseed.cfg"
 export MNT_DIR="${PWD}/mnt"
 export CUSTOM_DIR="${PWD}/custom"
 export CUSTOM_ISO_FILE="${PWD}/debian-12-custom.iso"
+
+export SUBNET="10.14.0.0"
+export NETMASK="255.255.255.0"
+export GATEWAY="10.14.0.1"
+export ADDRESS="10.14.0.10"
+export DNS_SERVERS="10.2.1.40"
+
+export HOST_NAME="debian"
+export HOST_DOMAIN="cloud.int"
+
+export HOST_USER="debian"
+export HOST_PASS=`openssl rand -hex 20`
+export HOST_TZ="Brazil/East"
+export HOST_AUTHORIZED_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4tzrayU6ahMhmWuicy+oFfy//9oB+2EdbbmDfA0d+k3SpYjWVqho64/L+sQIAN0RGBJx42GkbKi8B6AriPw8omLOCk2WSYW3ymEC7n3l32M5T4cLr8LIYwoMOBZkMtRc3H62PrHgDoTJLhUOvT2ewj1SLl7iU5gQuInwPE6jWooIb8R6KMUl31qNpkafCVPz5ovw0iYbDamHQF6sq081Xl39px2345T8TofIAocyBUfCOstmAvPaD9lXIV3j9JmPhAy0oweXpxdPiQzBHXepLh/jrvHrV5ggl2iwmLgF3uzwYdFlQN6eCniBtBEcGqEacb6oP2KHfHer04WIbAMHZ"
+
+# Required only for qemu-kvm
+export NAT_INTERFACE="enp4s0"
+export INTERFACE="net0"
+```
+
+2. Create the preseed file:
+```shell
+envsubst < preseed.cfg.template > preseed.cfg
 ```
 
 2. Cleanup and create the directories:
@@ -64,9 +87,31 @@ sudo chown -R ${USER}:${group} ${CUSTOM_ISO_FILE}
 
 6. Execute a test:
 ```shell
+sudo ip link del ${INTERFACE} 2>/dev/null
+sudo ip tuntap add ${INTERFACE} mode tap
+sudo ip addr add ${GATEWAY}/${NETMASK} dev ${INTERFACE}
+sudo ip link set ${INTERFACE} up
+sudo iptables -t nat -A POSTROUTING -o ${NAT_INTERFACE} -j MASQUERADE
+sudo sysctl -w net.ipv4.ip_forward=1
+
+
 qemu-img create disk.img 40G
 qemu-system-x86_64 \
-  -m 2048 \
+  -m 4096 \
+  -enable-kvm \
+  -smp 4 \
+  -cpu host \
+  -hda disk.img \
+  -cdrom ${CUSTOM_ISO_FILE}  \
+  -boot once=d \
+  -boot menu=on \
+  -netdev tap,id=net0,ifname=${INTERFACE},script=no,downscript=no \
+  -device virtio-net-pci,netdev=net0
+
+
+qemu-system-x86_64 \
+  -m 4096 \
+  -enable-kvm \
   -smp 2 \
   -cpu host \
   -hda disk.img \
@@ -74,4 +119,15 @@ qemu-system-x86_64 \
   -boot d \
   -net nic,model=virtio \
   -net user,hostfwd=tcp::2222-:22
+
+virt-install --name win10 --ram 2048 --vcpus=2 \
+  --boot hd,cdrom,menu=on \
+  --disk=/srv/win/en_windows_10_enterprise_ltsc_2019_x64_dvd_74865958.iso,device=cdrom \
+  --disk /srv/win/win10.qcow2,format=qcow2,bus=virtio \
+  --disk path=/srv/win/virtio-win.iso,device=cdrom  \
+  --disk path=/srv/win/en_microsoft_office_2013_64bit_dvd.iso,device=cdrom  \
+  --network network=win-net,model=virtio,mac="66:fb:19:b2:d3:11" \
+  --graphics vnc,listen=10.2.1.31,port=20001 --noautoconsole \
+  --os-type=windows --os-variant=win10
+
 ```
