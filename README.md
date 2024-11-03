@@ -87,27 +87,8 @@ sudo chown -R ${USER}:${group} ${CUSTOM_ISO_FILE}
 
 6. Execute a test:
 ```shell
-sudo ip link del ${INTERFACE} 2>/dev/null
-sudo ip tuntap add ${INTERFACE} mode tap
-sudo ip addr add ${GATEWAY}/${NETMASK} dev ${INTERFACE}
-sudo ip link set ${INTERFACE} up
-sudo iptables -t nat -A POSTROUTING -o ${NAT_INTERFACE} -j MASQUERADE
-sudo sysctl -w net.ipv4.ip_forward=1
-
 
 qemu-img create disk.img 40G
-qemu-system-x86_64 \
-  -m 4096 \
-  -enable-kvm \
-  -smp 4 \
-  -cpu host \
-  -hda disk.img \
-  -cdrom ${CUSTOM_ISO_FILE}  \
-  -boot once=d \
-  -boot menu=on \
-  -netdev tap,id=net0,ifname=${INTERFACE},script=no,downscript=no \
-  -device virtio-net-pci,netdev=net0
-
 
 qemu-system-x86_64 \
   -m 4096 \
@@ -120,14 +101,5 @@ qemu-system-x86_64 \
   -net nic,model=virtio \
   -net user,hostfwd=tcp::2222-:22
 
-virt-install --name win10 --ram 2048 --vcpus=2 \
-  --boot hd,cdrom,menu=on \
-  --disk=/srv/win/en_windows_10_enterprise_ltsc_2019_x64_dvd_74865958.iso,device=cdrom \
-  --disk /srv/win/win10.qcow2,format=qcow2,bus=virtio \
-  --disk path=/srv/win/virtio-win.iso,device=cdrom  \
-  --disk path=/srv/win/en_microsoft_office_2013_64bit_dvd.iso,device=cdrom  \
-  --network network=win-net,model=virtio,mac="66:fb:19:b2:d3:11" \
-  --graphics vnc,listen=10.2.1.31,port=20001 --noautoconsole \
-  --os-type=windows --os-variant=win10
 
 ```

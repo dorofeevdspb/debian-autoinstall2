@@ -4,7 +4,8 @@
 
 
 # Remove partitions:
-d-i preseed/early_command string dd if=/dev/zero of=/dev/sda bs=512 count=1 conv=notrunc
+d-i preseed/early_command string \
+dd if=/dev/zero of=/dev/sda bs=512 count=1 conv=notrunc
 
 # IP address:
 
@@ -61,6 +62,8 @@ d-i time/zone string ${HOST_TZ}
 
 ### Partitioning
 # Confirm that existing partitions can be erased
+d-i partman-auto/disk string /dev/sda
+# d-i partman-auto/disk string /dev/sda /dev/sdb
 d-i partman-lvm/confirm boolean true
 d-i partman-lvm/confirm_nooverwrite boolean true
 d-i partman-lvm/device_remove_lvm boolean true
