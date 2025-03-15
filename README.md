@@ -1,8 +1,16 @@
 # Debian automated installation using preseed file
 
 ## Image download
-Download [debian 12 netinst iso](https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.7.0-amd64-netinst.iso)
+проверьте последний релиз
 
+Download [debian 12 netinst iso](https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.9.0-amd64-netinst.iso)
+
+```sh
+
+wget -c https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/\
+  debian-12.9.0-amd64-netinst.iso
+
+```
 ## Pressed file
 The preseed file in this repository is provided as an example. Let's use it as a starting point for now.
 
@@ -10,29 +18,29 @@ The preseed file in this repository is provided as an example. Let's use it as a
 
 1. Define the environment variables:
 ```shell
-export ISO_FILE="${HOME}/iso/debian-12.4.0-amd64-netinst.iso"
+export ISO_FILE="${HOME}/iso/debian-12.9.0-amd64-netinst.iso"
 export PRESED_FILE="preseed.cfg"
 export MNT_DIR="${PWD}/mnt"
 export CUSTOM_DIR="${PWD}/custom"
 export CUSTOM_ISO_FILE="${PWD}/debian-12-custom.iso"
 
-export SUBNET="10.14.0.0"
-export NETMASK="255.255.255.0"
-export GATEWAY="10.14.0.1"
-export ADDRESS="10.14.0.10"
-export DNS_SERVERS="10.2.1.40"
+export SUBNET="172.20.0.0"
+export NETMASK="255.255.0.0"
+export GATEWAY="172.20.0.1"
+export ADDRESS="172.20.0.52"
+export DNS_SERVERS="172.20.0.1"
 
 export HOST_NAME="debian"
-export HOST_DOMAIN="cloud.int"
+export HOST_DOMAIN="lan"
 
-export HOST_USER="debian"
+export HOST_USER="master"
 export HOST_PASS=`openssl rand -hex 20`
-export HOST_TZ="Brazil/East"
-export HOST_AUTHORIZED_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4tzrayU6ahMhmWuicy+oFfy//9oB+2EdbbmDfA0d+k3SpYjWVqho64/L+sQIAN0RGBJx42GkbKi8B6AriPw8omLOCk2WSYW3ymEC7n3l32M5T4cLr8LIYwoMOBZkMtRc3H62PrHgDoTJLhUOvT2ewj1SLl7iU5gQuInwPE6jWooIb8R6KMUl31qNpkafCVPz5ovw0iYbDamHQF6sq081Xl39px2345T8TofIAocyBUfCOstmAvPaD9lXIV3j9JmPhAy0oweXpxdPiQzBHXepLh/jrvHrV5ggl2iwmLgF3uzwYdFlQN6eCniBtBEcGqEacb6oP2KHfHer04WIbAMHZ"
+export HOST_TZ="Europe/Moscow"
+export HOST_AUTHORIZED_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCTLms1Cc3VERlpvERj+9Kd+f6NkK1+Hx3DLgXIeiLIxJ727Ptuf6DO2gSKRkJUnSi0YmvBtU86S6YVZFPM8MzkobC8iYH/UQLLJwJd9zkV7W+DZjn7z/6uOAeTIRCKs/wjgQRl8BheXSt9TQI9dBXtGbw+2aEyIyLp+J2sGwDiAQior+HStGawVheW/jIO/7e/iG5HSh3thfDtD3aVxbUCux27HrYueDsdHZp7hyCXHVpvlk6XsMZHz7Duerr8s3HnnHdw6ntmynnOoC+Icynr3cdZdiUwOoy2x1Ldm9pXcZGp7Uf4u9XiFkOQKlUTez6KgvHS3FHE5qCBQNFLumTTxGldUb8yTFr3l20/gJVtDeTrC+RGHTawJxO35sn7L/UmgSM+zdmtO84plBVkKQveJvCBlWwmcZ7JKgqzI8zjaqJcH3Ue5FZHyzk9YIKk6ksAK0QUio5vaoRUeZETVLqmj9qXbAO6W/uhTzSB9eSTCg6s6kvZ6liQUojmJ/45E+DeYz69RHEZhpsUed0wnJCd+i0EAg7G6mzLy7rDW1rEcZeU9OiT0fE1HPHGYhVqcNTFZHpKASPWqhSEIudQgPHWeVmv8ihZWNqO1sPRmYp3c7XrPKczvdoLNLbBbLEXe7Y6sm4M7K++uYTkH/VRX1ErJ03gFdOVG2NDojS9rpBZEw== dorofeev.d.spb@gmail.com"
 
 # Required only for qemu-kvm
-export NAT_INTERFACE="enp4s0"
-export INTERFACE="net0"
+#export NAT_INTERFACE="enp4s0"
+#export INTERFACE="net0"
 ```
 
 2. Create the preseed file:
