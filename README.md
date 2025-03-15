@@ -5,7 +5,7 @@
 
 ```sh
 
-git clone git@github.com/dorofeevdspb/debian-autoinstall2
+git clone ssh://git@github.com:dorofeevdspb/debian-autoinstall2.git
 
 ```
 
