@@ -1,4 +1,13 @@
+
+
+
 # Debian automated installation using preseed file
+
+```sh
+
+git clone git@github.com/dorofeevdspb/debian-autoinstall2
+
+```
 
 ## Image download
 проверьте последний релиз
